@@ -1,0 +1,46 @@
+# ---- Secrets: never commit these ----
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# ---- Uploaded and large files (videos, pictures, documents) ----
+clcBackend/storage/
+storage/
+media/
+*.mp4
+*.mov
+*.avi
+*.mkv
+*.webm
+
+# ---- Database dumps and local databases ----
+*.sql
+*.sqlite3
+*.dump
+*.bak
+
+# ---- Python ----
+venv/
+.venv/
+env/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+staticfiles/
+
+# ---- Node / frontend ----
+node_modules/
+clc-website/dist/
+dist/
+*.log
+npm-debug.log*
+
+# ---- Editors and system files ----
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.swp

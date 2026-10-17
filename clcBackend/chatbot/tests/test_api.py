@@ -1,0 +1,111 @@
+"""The flow builder API, signed in through the real accounts endpoints."""
+from django.test import TestCase
+
+from chatbot.starter import intake_flow
+from conversations.models import BotFlowVersion, FlowStatus
+from tracking.models import ActivityEvent
+
+from .helpers import make_org_users, sign_in
+
+
+class BuilderApiTests(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        make_org_users()
+
+    def setUp(self):
+        self.token = sign_in(self.client, 'admin@clc.tz', 'S3cure-pass!', 'clc_admin')
+
+    def api(self, method, url, data=None, token=None):
+        return getattr(self.client, method)(f'/api/chatbot/{url}', data, content_type='application/json',
+                                            headers={'Authorization': f'Bearer {token or self.token}'})
+
+    def test_only_clc_admin_can_use_builder(self):
+        self.assertEqual(self.client.get('/api/chatbot/flows/').status_code, 401)
+        firm_token = sign_in(self.client, 'admin@clc.tz', 'S3cure-pass!', 'firm_admin')
+        self.assertEqual(self.api('get', 'flows/', token=firm_token).status_code, 403)  # same person, firm role
+        self.assertEqual(self.api('get', 'flows/').status_code, 200)
+
+    def test_catalog(self):
+        data = self.api('get', 'node-types/').json()
+        types = {t['type'] for t in data['node_types']}
+        self.assertTrue({'start', 'message', 'ask_buttons', 'ask_list', 'condition', 'create_case', 'handover'} <= types)
+        self.assertEqual([t['id'] for t in data['trigger_types']], ['new_conversation', 'keyword'])
+
+    def test_create_edit_publish_and_restore(self):
+        res = self.api('post', 'flows/', {'name': 'Wills intake'})
+        self.assertEqual(res.status_code, 201)
+        flow = res.json()
+        fid = flow['id']
+        self.assertEqual(flow['editing']['from'], 'draft')
+        self.assertEqual([n['type'] for n in flow['editing']['definition']['nodes']], ['start'])
+        self.assertEqual(self.api('post', 'flows/', {'name': 'wills INTAKE'}).status_code, 400)  # duplicate name
+
+        # Publishing an unconnected Start is refused with the reason.
+        res = self.api('post', f'flows/{fid}/publish/')
+        self.assertEqual(res.status_code, 400)
+        self.assertIn('Start is not connected to anything.', [i['message'] for i in res.json()['issues']])
+
+        # Save the CLC intake as the draft; it validates clean, then publish.
+        res = self.api('put', f'flows/{fid}/draft/', {'definition': intake_flow()})
+        self.assertEqual(res.status_code, 200)
+        self.assertFalse([i for i in res.json()['issues'] if i['level'] == 'error'])
+        res = self.api('patch', f'flows/{fid}/', {'triggers': [
+            {'type': 'keyword', 'config': {'words': ['wosia', 'will'], 'match': 'contains'}, 'priority': 10}]})
+        self.assertEqual(res.json()['triggers'][0]['config'], {'words': ['wosia', 'will'], 'match': 'contains'})
+        res = self.api('post', f'flows/{fid}/publish/')
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(res.json()['published']['version'], 1)
+        self.assertIsNone(res.json()['draft'])
+        self.assertTrue(ActivityEvent.objects.filter(entity_id=fid, action='flow.published').exists())
+
+        # Opening it shows the live version and creates nothing; saving creates draft v2.
+        opened = self.api('get', f'flows/{fid}/').json()
+        self.assertEqual((opened['editing']['from'], opened['draft']), ('published', None))
+        self.assertEqual(self.api('post', f'flows/{fid}/publish/').status_code, 400)  # nothing to publish
+        self.assertEqual(self.api('put', f'flows/{fid}/draft/', {'definition': opened['editing']['definition']}).json()['version'], 2)
+        self.api('post', f'flows/{fid}/publish/')
+        statuses = dict(BotFlowVersion.objects.filter(flow_id=fid).values_list('version', 'status'))
+        self.assertEqual(statuses, {1: FlowStatus.ARCHIVED, 2: FlowStatus.PUBLISHED})
+
+        # Restore v1 into a new draft.
+        v1 = next(v for v in self.api('get', f'flows/{fid}/versions/').json() if v['version'] == 1)
+        res = self.api('post', f"flows/{fid}/versions/{v1['id']}/restore/")
+        self.assertEqual(res.json()['version'], 3)
+
+        # A flow another flow jumps to cannot be deleted until that block is removed.
+        other = self.api('post', 'flows/', {'name': 'Caller'}).json()['id']
+        jump = {'nodes': [{'id': 'start', 'type': 'start', 'data': {}}, {'id': 'g', 'type': 'go_to_flow', 'data': {'flow_id': fid}}],
+                'edges': []}
+        self.api('put', f'flows/{other}/draft/', {'definition': jump})
+        res = self.api('delete', f'flows/{fid}/')
+        self.assertEqual(res.status_code, 409)
+        self.assertIn('Caller', res.json()['detail'])
+        self.assertEqual(self.api('delete', f'flows/{other}/').status_code, 204)
+
+        # Once nothing depends on it, even a published flow can be deleted.
+        self.assertFalse(self.api('patch', f'flows/{fid}/', {'is_active': False}).json()['is_active'])
+        self.assertEqual(self.api('delete', f'flows/{fid}/').status_code, 204)
+        self.assertTrue(ActivityEvent.objects.filter(entity_id=fid, action='flow.deleted').exists())
+
+    def test_bad_input_is_refused(self):
+        fid = self.api('post', 'flows/', {'name': 'X'}).json()['id']
+        self.assertEqual(self.api('put', f'flows/{fid}/draft/', {'definition': {'nodes': 'nope'}}).status_code, 400)
+        res = self.api('patch', f'flows/{fid}/', {'triggers': [{'type': 'keyword', 'config': {'words': []}}]})
+        self.assertEqual(res.status_code, 400)
+        self.assertEqual(self.api('patch', f'flows/{fid}/', {'triggers': [{'type': 'cron'}]}).status_code, 400)
+        self.assertEqual(self.api('delete', f'flows/{fid}/').status_code, 204)  # never published: deletable
+
+    def test_simulate_runs_unsaved_canvas(self):
+        fid = self.api('post', 'flows/', {'name': 'Sim'}).json()['id']
+        res = self.api('post', f'flows/{fid}/simulate/', {'definition': intake_flow(), 'lang': 'en'}).json()
+        self.assertEqual(res['waiting_node'], 'language')
+        self.assertEqual(res['messages'][0]['type'], 'buttons')
+        res = self.api('post', f'flows/{fid}/simulate/', {'definition': intake_flow(), 'state': res['state'],
+                                                          'event': {'kind': 'choice', 'choice_id': 'lang_en'}}).json()
+        self.assertEqual(res['waiting_node'], 'menu')
+        self.assertEqual(res['trace'], ['language', 'privacy', 'menu'])
+        res = self.api('post', f'flows/{fid}/simulate/', {'definition': intake_flow(), 'state': res['state'],
+                                                          'event': {'kind': 'choice', 'choice_id': 'menu_human'}}).json()
+        self.assertEqual(res['ended'], 'handoff')
+        self.assertEqual(res['effects'][0]['effect'], 'handover')

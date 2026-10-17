@@ -1,0 +1,81 @@
+[
+  {
+    "native": "sw",
+    "title": "Mkataba kati ya Mchimbaji Mdogo na Mwekezaji",
+    "description": "Sheria za madini za Tanzania zinawawezesha wachimbaji wadogo kunufaika na rasilimali zao na kushirikiana na wawekezaji kwa njia salama na halali kupitia Makubaliano ya Msaada wa Kiufundi (TSA).",
+    "items": [
+      "Uhakiki wa Leseni Ndogo ya Uchimbaji (PML)",
+      "Uandishi/uhakiki wa mikataba na wenye maduara",
+      "Kuratibu Scoping Report au uhakiki wa Cheti cha EIA",
+      "Mipango mitano ya uendeshaji wa mgodi",
+      "Nyaraka za vikundi/vyama vya ushirika",
+      "Uhakiki wa nyaraka za mwekezaji na mmiliki",
+      "Uandishi na kusaini Mkataba wa TSA",
+      "Kuwasilisha maombi ya TSA",
+      "Ufuatiliaji hadi uidhinishaji"
+    ],
+    "image": "/images/mining.jpg"
+  },
+  {
+    "native": "en",
+    "title": "How to Partner with a Tanzanian Miner & Invest in Gold — Legally",
+    "description": "The Technical Support Agreement (TSA) gives foreign investors a legal framework to partner with PML holders, in compliance with Section 8(3) of the Mining Act, Cap 123 (2019).",
+    "items": [
+      "PML verification",
+      "Contract preparation & review",
+      "Scoping Report or EIA Certificate review",
+      "Five mining operational plans",
+      "Group & cooperative documents",
+      "Investor & licence-holder document review",
+      "Drafting & execution of the TSA",
+      "Guidance on application submission",
+      "Approval follow-up to completion"
+    ],
+    "image": "/images/dar.jpg"
+  },
+  {
+    "native": "zh",
+    "title": "无需自持许可证即可合法投资黄金矿业",
+    "description": "坦桑尼亚的技术支持协议（TSA）提供了合法框架，允许外国投资者与初级采矿许可证（PML）持有者合作，并符合《2019年矿业法》第123章第8(3)条的规定。",
+    "items": [
+      "初级采矿许可证的核实",
+      "起草或审核持证人与小型矿工的合同",
+      "协助获取范围界定报告或审核环评证书",
+      "协助准备采矿运营计划",
+      "起草并核实合作社或团体法律文件",
+      "审核投资者和许可证持有人的文件",
+      "起草并执行技术支持协议",
+      "协助向矿业委员会提交申请",
+      "跟进并完成审批流程"
+    ],
+    "image": "/images/gold.jpg"
+  },
+  {
+    "native": "sw",
+    "title": "Badilisha Jina Kisheria — Kwa Deed Poll / Kiapo cha Majina",
+    "description": "Una changamoto ya majina kwenye vitambulisho vyako? Tunaandaa Deed Poll rasmi, kuisajili serikalini na kuitangaza kwenye Gazeti la Serikali kama sheria inavyotaka.",
+    "items": [
+      "Kupitia nyaraka zako kwa umakini",
+      "Ushauri na Wakili aliyeidhinishwa",
+      "Kuandaa Deed Poll rasmi",
+      "Usajili Wizara ya Ardhi",
+      "Tangazo kwenye Gazeti la Serikali",
+      "Barua rasmi kwenda NIDA",
+      "Kurekebisha majina kwa Mafao ya NSSF"
+    ],
+    "image": "/images/deed.jpg"
+  },
+  {
+    "native": "sw",
+    "title": "Andika Wosia — Usiache Migogoro",
+    "description": "Umejenga mali zako kwa juhudi kubwa — usiache urithi wako uingie kwenye migogoro. Andika wosia haraka, salama, kwa mwongozo wa wakili mwenye uzoefu wa mirathi.",
+    "items": [
+      "Nakala ya Wosia (PDF) — Bure",
+      "Kuandikiwa Wosia na Wakili",
+      "Ushauri kupitia Simu au WhatsApp",
+      "Uhakiki wa Wosia kabla ya kusaini",
+      "Ushauri wa mahali salama pa kuhifadhi"
+    ],
+    "image": "/images/family.jpg"
+  }
+]
