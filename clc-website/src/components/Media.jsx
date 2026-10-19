@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { ArrowLeft, ArrowRight, CalendarDays, Clock, Maximize2, Minus, Play, Search, X } from 'lucide-react'
 import { UI, useLang } from '../i18n.jsx'
@@ -18,35 +18,15 @@ function Thumb({ m, className }) {
   return null
 }
 
-// Podcast and Mijadala play on their own, without sound, to make the page lively; Machapisho stay still.
-const AUTOPLAY = new Set(['podcast', 'mijadala'])
-const autoplays = (m) => AUTOPLAY.has(m.type) && !!m.video
-
-// A silent, looping preview that only runs while it is on screen (so it does not load or play unseen videos).
-function AutoVideo({ src, poster, className }) {
-  const ref = useRef(null)
-  useEffect(() => {
-    const el = ref.current
-    if (!el || !('IntersectionObserver' in window)) return undefined
-    const io = new IntersectionObserver(([e]) => {
-      if (e.isIntersecting) el.play().catch(() => {})
-      else el.pause()
-    }, { threshold: 0.5 })
-    io.observe(el)
-    return () => io.disconnect()
-  }, [])
-  return <video ref={ref} className={className} src={src} poster={poster || undefined} muted loop playsInline preload="metadata" tabIndex={-1} aria-hidden="true" />
-}
-
 const isVideo = (m) => m.type !== 'machapisho' || !!m.youtube || !!m.video
 
 function MediaCard({ m, lang, featured = false }) {
   return (
     <motion.article layout className={`mcard ${featured ? 'mcard--feat' : ''}`} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
       <a href={`/media/${m.id}`} className="mcard-img">
-        {autoplays(m) ? <AutoVideo src={m.video} poster={m.cover} /> : <Thumb m={m} />}
+        <Thumb m={m} />
         <span className={`mtag mtag--${m.type}`}>{typeLabel(m.type, lang)}</span>
-        {isVideo(m) && !autoplays(m) && <span className="mplay"><Play size={featured ? 30 : 22} fill="currentColor" /></span>}
+        {isVideo(m) && <span className="mplay"><Play size={featured ? 30 : 22} fill="currentColor" /></span>}
         {m.duration && <span className="mdur"><Clock size={12} /> {m.duration}</span>}
       </a>
       <div className="mcard-body">
@@ -169,9 +149,9 @@ export function MediaPage({ id }) {
         <article>
           <Reveal className="mplayer">
             {m.youtube ? (
-              <iframe src={`https://www.youtube.com/embed/${m.youtube}${AUTOPLAY.has(m.type) ? '?autoplay=1&mute=1' : ''}`} title={pick(m.title, lang)} allow="accelerometer; autoplay; clipboard-write; encrypted-media; picture-in-picture" allowFullScreen />
+              <iframe src={`https://www.youtube.com/embed/${m.youtube}`} title={pick(m.title, lang)} allow="accelerometer; autoplay; clipboard-write; encrypted-media; picture-in-picture" allowFullScreen />
             ) : m.video ? (
-              <video src={m.video} poster={m.cover || undefined} controls playsInline preload="metadata" autoPlay={AUTOPLAY.has(m.type)} muted={AUTOPLAY.has(m.type)} />
+              <video src={m.video} poster={m.cover || undefined} controls playsInline preload="metadata" />
             ) : (
               <>
                 <img src={m.image} alt="" />
