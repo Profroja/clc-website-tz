@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import Navbar from './components/Navbar.jsx'
 import HeroSlider from './components/HeroSlider.jsx'
 import { ServiceBands, ServicesOverview } from './components/Services.jsx'
@@ -7,54 +7,45 @@ import Login from './components/Login.jsx'
 import LivePage from './components/LivePage.jsx'
 import LegalPage from './components/LegalPage.jsx'
 import { legalDoc } from './legal.js'
+import { usePath } from './router.js'
 import AppointmentModal from './appointments/AppointmentModal.jsx'
 import Dashboard from './dashboard/Dashboard.jsx'
 import Join from './join/Join.jsx'
 import Track from './join/Track.jsx'
 import { FinalCTA, FloatingWA, Footer, HowItWorks, PartnerSection, WhyChoose } from './components/Sections.jsx'
 
-const MEDIA_ROUTE = /^#\/media\/(.+)$/
-const JOIN_ROUTE = /^#\/join\/(track|edit)\/([0-9a-f-]{36})\/([\w-]+)$/
-
-function useHash() {
-  const [hash, setHash] = useState(window.location.hash)
-  useEffect(() => {
-    const on = () => setHash(window.location.hash)
-    window.addEventListener('hashchange', on)
-    return () => window.removeEventListener('hashchange', on)
-  }, [])
-  return hash
-}
+const MEDIA_ROUTE = /^\/media\/(.+)$/
+const JOIN_ROUTE = /^\/join\/(track|edit)\/([0-9a-f-]{36})\/([\w-]+)$/
 
 export default function App() {
-  const hash = useHash()
-  const match = hash.match(MEDIA_ROUTE)
+  const path = usePath()
+  const match = path.match(MEDIA_ROUTE)
   const mediaId = match ? decodeURIComponent(match[1]) : null
-  const legal = legalDoc(hash.slice(2))
+  const legal = legalDoc(path.slice(1))
 
-  // Hash routing swaps the whole page, so the browser can't scroll to anchors itself.
+  // A new page starts at the top, unless a section link (#services from another page) asked for a section.
   useEffect(() => {
-    if (mediaId || hash.startsWith('#/')) { window.scrollTo(0, 0); return }
-    const el = hash.length > 1 && document.querySelector(hash)
+    const section = window.history.state?.section
+    const el = section && document.getElementById(section)
     if (el) el.scrollIntoView()
     else window.scrollTo(0, 0)
-  }, [hash, mediaId])
+  }, [path])
 
-  if (hash === '#/login') return <Login />
-  if (hash === '#/join') return <Join />
-  const joinRoute = hash.match(JOIN_ROUTE)
+  if (path === '/login') return <Login />
+  if (path === '/join') return <Join />
+  const joinRoute = path.match(JOIN_ROUTE)
   if (joinRoute) {
     const [, mode, id, token] = joinRoute
     return mode === 'track' ? <Track id={id} token={token} /> : <Join resume={{ id, token }} />
   }
-  if (hash.startsWith('#/app')) return <Dashboard hash={hash} />
+  if (path.startsWith('/app')) return <Dashboard path={path} />
 
   return (
     <>
       <Navbar />
-      {hash === '#/media' ? (
+      {path === '/media' ? (
         <MediaArchive />
-      ) : hash === '#/live' ? (
+      ) : path === '/live' ? (
         <LivePage />
       ) : legal ? (
         <LegalPage doc={legal} />
@@ -73,7 +64,7 @@ export default function App() {
         </main>
       )}
       <Footer />
-      <LiveMini hidden={hash === '#/live'} />
+      <LiveMini hidden={path === '/live'} />
       <AppointmentModal />
       <FloatingWA />
     </>

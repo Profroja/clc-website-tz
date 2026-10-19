@@ -13,6 +13,7 @@ import ConversationsInbox from './Inbox.jsx'
 import AdminMatters from './Matters.jsx'
 import { FirmCases, FirmOverview, FirmProfile, FirmReferrals, FirmTeam } from './Firm.jsx'
 import { AdvocateMatters, AdvocateOverview, AdvocateDetails, AdvocateSubscription } from './Advocate.jsx'
+import { navigate } from '../router.js'
 
 // One entry per sidebar link: [path, label, icon, page]
 const NAV = {
@@ -49,13 +50,13 @@ const DEMO = {
   advocate: { user: { full_name: 'Neema Lyimo', email: 'neema@pnjlegal.co.tz' }, membership: { role: 'advocate', organization: 'PNJ Legal Consultants' } },
 }
 
-function readAuth(hash) {
+function readAuth(path) {
   try {
     const stored = JSON.parse(sessionStorage.getItem('clc_auth'))
     if (stored) return stored
   } catch { /* ignore */ }
   // Dev-only preview so the dashboards can be viewed before the API is connected.
-  if (import.meta.env.DEV) return DEMO[hash.split('/')[2]] || null
+  if (import.meta.env.DEV) return DEMO[path.split('/')[2]] || null
   return null
 }
 
@@ -81,7 +82,7 @@ function UserMenu({ auth, onSignOut }) {
             <div><strong>{auth.user.full_name}</strong><small>{auth.membership.organization}</small></div>
           </div>
           {auth.membership.role === 'advocate' && (
-            <a role="menuitem" className="d-menu-item" href="#/app/advocate/details" onClick={() => setOpen(false)}><UserCircle size={17} /> My details</a>
+            <a role="menuitem" className="d-menu-item" href="/app/advocate/details" onClick={() => setOpen(false)}><UserCircle size={17} /> My details</a>
           )}
           <button role="menuitem" className="d-menu-out" onClick={onSignOut}><LogOut size={17} /> Sign out</button>
         </div>
@@ -90,18 +91,18 @@ function UserMenu({ auth, onSignOut }) {
   )
 }
 
-export default function Dashboard({ hash }) {
-  const auth = readAuth(hash)
+export default function Dashboard({ path }) {
+  const auth = readAuth(path)
   const [menu, setMenu] = useState(false)
-  const [, role, page] = hash.replace('#/', '').split('/') // app / role / page
+  const [, role, page] = path.slice(1).split('/') // app / role / page
   const own = auth && ROLES[auth.membership.role]
 
   // Not signed in -> login. Wrong or missing role segment -> the user's own home.
   useEffect(() => {
-    if (!auth) window.location.hash = '#/login'
-    else if (role !== own.key) window.location.hash = own.home
+    if (!auth) navigate('/login', { replace: true })
+    else if (role !== own.key) navigate(own.home, { replace: true })
   }, [auth, role, own])
-  useEffect(() => setMenu(false), [hash])
+  useEffect(() => setMenu(false), [path])
 
   if (!auth || role !== own.key) return null
   const items = NAV[role]
@@ -115,7 +116,7 @@ export default function Dashboard({ hash }) {
         <p className="d-side-label">{own.label}</p>
         <nav>
           {items.filter((i) => !i[4]).map(([p, label, Icon]) => (
-            <a key={p} href={`#/app/${role}/${p}`} className={active[0] === p ? 'on' : ''}><Icon size={19} /> {label}</a>
+            <a key={p} href={`/app/${role}/${p}`} className={active[0] === p ? 'on' : ''}><Icon size={19} /> {label}</a>
           ))}
         </nav>
       </aside>

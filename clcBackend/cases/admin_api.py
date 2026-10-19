@@ -222,7 +222,7 @@ def _email_advocate(advocate, case):
     """No client details: the advocate sees the matter, with the client's name, in the portal."""
     body = (f'Hello {advocate.user.full_name},\n\nA new matter was assigned to you on the CLC platform.\n\n'
             f'Reference: {case.reference}\nService: {case.service.name_en if case.service_id else "Legal matter"}\n'
-            f'Region: {case.region or "-"}\n\nOpen it in your dashboard: {settings.FRONTEND_URL}/#/app/advocate/matters/{case.id}')
+            f'Region: {case.region or "-"}\n\nOpen it in your dashboard: {settings.FRONTEND_URL}/app/advocate/matters/{case.id}')
     try:
         EmailMessage(f'New matter assigned: {case.reference}', body, to=[advocate.user.email]).send()
     except Exception:  # a mail problem must never undo the assignment

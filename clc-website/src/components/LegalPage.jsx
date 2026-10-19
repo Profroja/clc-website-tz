@@ -43,7 +43,7 @@ export default function LegalPage({ doc }) {
           <h4 className="mside-title">{t({ sw: 'Nyaraka za Kisheria', en: 'Legal documents', zh: '法律文件' })}</h4>
           <nav className="legal-nav">
             {LEGAL_DOCS.map((d) => (
-              <a key={d.slug} href={`#/${d.slug}`} className={d.slug === doc.slug ? 'active' : ''}>
+              <a key={d.slug} href={`/${d.slug}`} className={d.slug === doc.slug ? 'active' : ''}>
                 <FileText size={16} /> {t(d.short)}
               </a>
             ))}

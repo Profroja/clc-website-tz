@@ -93,7 +93,7 @@ export function PartnerSection() {
           <span className="eyebrow">{t(P.eyebrow)}</span>
           <h2>{t(P.title)}</h2>
           <p>{t(P.sub)}</p>
-          <a className="btn btn-gold btn-lg btn-shine" href="#/join">
+          <a className="btn btn-gold btn-lg btn-shine" href="/join">
             <Handshake size={20} /> {t(P.cta)} <ArrowRight size={18} />
           </a>
           <small className="partner-note">{t(P.note)}</small>
@@ -321,7 +321,7 @@ export function Footer() {
         <div>
           <h4>{t(F.quick)}</h4>
           {['home', 'services', 'contact'].map((k) => <a key={k} href={`#${k === 'home' ? 'home' : k}`}>{t(UI.nav[k])}</a>)}
-          {LEGAL_DOCS.map((d) => <a key={d.slug} href={`#/${d.slug}`}>{t(d.short)}</a>)}
+          {LEGAL_DOCS.map((d) => <a key={d.slug} href={`/${d.slug}`}>{t(d.short)}</a>)}
         </div>
         <div>
           <h4>{t(F.services)}</h4>
@@ -334,13 +334,13 @@ export function Footer() {
           <p className="f-line"><Mail size={15} /> <a href="mailto:info@clc.tz">info@clc.tz</a></p>
           <p className="f-line"><MapPin size={15} /> P.O. Box 4661, Dar es Salaam</p>
           <p className="f-line"><Clock size={15} /> Mon–Fri 9–18 • Sat 9–13</p>
-          <a href="#/login" className="btn btn-outline-gold f-login"><LogIn size={16} /> {t({ sw: 'Ingia', en: 'Login', zh: '登录' })}</a>
+          <a href="/login" className="btn btn-outline-gold f-login"><LogIn size={16} /> {t({ sw: 'Ingia', en: 'Login', zh: '登录' })}</a>
         </div>
       </div>
       <div className="container footer-bottom">
         <span>© {new Date().getFullYear()} Community Legal Clinic (CLC). All rights reserved.</span>
         <span className="f-disc">{t(F.disclaimer)}</span>
-        <span className="f-links"><a href="#/privacy-policy">Privacy</a><a href="#/terms">Terms</a><a href="#/legal-disclaimer">Disclaimer</a></span>
+        <span className="f-links"><a href="/privacy-policy">Privacy</a><a href="/terms">Terms</a><a href="/legal-disclaimer">Disclaimer</a></span>
       </div>
     </footer>
   )

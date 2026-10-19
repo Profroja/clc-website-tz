@@ -22,7 +22,7 @@ export function FirmOverview() {
           {incoming.map((r) => (
             <div key={r.id} className="d-row">
               <div className="d-row-main"><strong>{r.ref}</strong><small>{r.service} · {r.region}</small></div>
-              <a href="#/app/firm/referrals" className="btn btn-navy d-sm">Open</a>
+              <a href="/app/firm/referrals" className="btn btn-navy d-sm">Open</a>
             </div>
           ))}
         </Card>

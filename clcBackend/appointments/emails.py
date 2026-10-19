@@ -91,7 +91,7 @@ def send_admin_notice(appt):
             f'Reference: {appt.reference}\nWhen: {day}, {hour} (EAT)\nMeeting: {KIND["en"][appt.meeting_kind]}\n'
             f'Service: {appt.service}\n\nClient: {appt.full_name}\nPhone: {appt.phone_e164}\nEmail: {appt.email}\n'
             f'Language: {appt.language}\n' + (f'\nNote from the client:\n{appt.note}\n' if appt.note else '') +
-            f'\nSee all appointments: {settings.FRONTEND_URL}/#/app/admin/appointments')
+            f'\nSee all appointments: {settings.FRONTEND_URL}/app/admin/appointments')
     return _send(EmailMessage(f'New appointment: {appt.full_name} — {day}, {hour}', body, to=recipients, reply_to=[appt.email]))
 
 

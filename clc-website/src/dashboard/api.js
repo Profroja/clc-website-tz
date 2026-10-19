@@ -1,6 +1,9 @@
 // Calls to the Django API with the signed-in user's portal tokens.
 // The access token is short-lived (15 min). When the API answers 401 we trade the refresh
 // token for a new pair once and retry; if that fails the user is sent back to the login page.
+
+import { navigate } from '../router.js'
+
 export class ApiError extends Error {
   constructor(status, data) {
     super(data?.detail || data?.error || `Request failed (${status})`)
@@ -50,7 +53,7 @@ function refreshTokens() {
 
 function sessionExpired() {
   clearAuth()
-  window.location.hash = '#/login'
+  navigate('/login')
 }
 
 async function send(path, method, body, extra) {
@@ -93,5 +96,5 @@ export async function signOut() {
     if (auth?.access) await api('auth/logout/', { method: 'POST', body: { refresh: auth.refresh } })
   } catch { /* offline or already expired: still sign out locally */ }
   clearAuth()
-  window.location.hash = '#/login'
+  navigate('/login')
 }

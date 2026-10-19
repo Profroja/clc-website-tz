@@ -2,9 +2,9 @@
 // Each export maps to a backend table; swap for fetch() calls later.
 
 export const ROLES = {
-  clc_admin: { key: 'admin', label: 'Administrator', home: '#/app/admin/overview' },
-  firm_admin: { key: 'firm', label: 'Law firm representative', home: '#/app/firm/overview' },
-  advocate: { key: 'advocate', label: 'Advocate', home: '#/app/advocate/overview' },
+  clc_admin: { key: 'admin', label: 'Administrator', home: '/app/admin/overview' },
+  firm_admin: { key: 'firm', label: 'Law firm representative', home: '/app/firm/overview' },
+  advocate: { key: 'advocate', label: 'Advocate', home: '/app/advocate/overview' },
 }
 
 export const SERVICES = [

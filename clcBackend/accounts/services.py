@@ -107,7 +107,7 @@ def create_user_with_role(admin_membership, full_name, mail, phone, role, organi
     if temp:
         body += (f'Username: {mail}\nTemporary password: {temp}\n'
                  f'You will be asked to choose a new password the first time you sign in.\n\n')
-    body += f'Sign in: {settings.FRONTEND_URL}/#/login'
+    body += f'Sign in: {settings.FRONTEND_URL}/login'
     try:
         send_mail('Your CLC platform account', body, settings.DEFAULT_FROM_EMAIL, [mail])
     except Exception:  # a mail outage must not undo the account

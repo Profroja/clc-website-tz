@@ -6,6 +6,7 @@ import { Reveal } from '../components/ui.jsx'
 import { LANGUAGES, REGIONS, errorLines, jreq, saved } from './joinApi.js'
 import { api as portalApi } from '../dashboard/api.js'
 import { AreaPicker, Chips, MultiSelect, Field, JoinShell, Section } from './parts.jsx'
+import { navigate } from '../router.js'
 
 const L = (sw, en) => ({ sw, en })
 
@@ -110,7 +111,7 @@ export default function Join({ resume, admin = false }) {
     jreq(`applications/${c.id}/`, { token: c.token })
       .then((a) => {
         if (a.editable) { setCreds(c); setApp(a); setForm(toForm(a)) } else if (!resume) saved.clear()
-        if (!a.editable && resume) window.location.hash = `#/join/track/${c.id}/${c.token}`
+        if (!a.editable && resume) navigate(`/join/track/${c.id}/${c.token}`)
       })
       .catch(() => { if (!resume) saved.clear() })
       .finally(() => setBooting(false))
@@ -189,8 +190,8 @@ export default function Join({ resume, admin = false }) {
           {done.application_number && <p className="j-number">{done.application_number}</p>}
           {admin ? <p>The firm was approved as soon as you submitted it, and its trial has started. It now appears in the Law firms list. The firm's contact person has been emailed.</p> : <p>{t(L('CLC itapitia maombi yako. Tumia kiungo hapa chini kufuatilia hatua na kujibu maombi yetu ya nyaraka au marekebisho. Pia tumekutumia barua pepe.', 'CLC will review your application. Use the link below to follow progress and answer any request for documents or corrections. We also emailed it to you.'))}</p>}
           {admin
-            ? <a className="btn btn-gold btn-lg" href="#/app/admin/firms">Back to law firms <ArrowRight size={18} /></a>
-            : <a className="btn btn-gold btn-lg" href={`#/join/track/${creds.id}/${creds.token}`}>{t(L('Fuatilia maombi', 'Track my application'))} <ArrowRight size={18} /></a>}
+            ? <a className="btn btn-gold btn-lg" href="/app/admin/firms">Back to law firms <ArrowRight size={18} /></a>
+            : <a className="btn btn-gold btn-lg" href={`/join/track/${creds.id}/${creds.token}`}>{t(L('Fuatilia maombi', 'Track my application'))} <ArrowRight size={18} /></a>}
           {!admin && <p className="j-note">{t(L('Maombi si idhini ya moja kwa moja: kampuni haitaona mashauri ya wateja hadi CLC iidhinishe.', 'Registration is an application for approval, not automatic access: your firm cannot see client matters until CLC approves it.'))}</p>}
         </motion.div>
       </JoinShell>
@@ -388,7 +389,7 @@ export default function Join({ resume, admin = false }) {
         )}
 
         <div className="j-nav">
-          {step > 0 ? <button className="btn btn-ghost" onClick={back} disabled={busy}><ArrowLeft size={16} /> {t(L('Rudi', 'Back'))}</button> : <button className="btn btn-ghost" onClick={() => { if (admin) { window.location.hash = '#/app/admin/firms'; return } setDir(-1); setStarted(false) }}><ArrowLeft size={16} /> {t(L('Rudi', 'Back'))}</button>}
+          {step > 0 ? <button className="btn btn-ghost" onClick={back} disabled={busy}><ArrowLeft size={16} /> {t(L('Rudi', 'Back'))}</button> : <button className="btn btn-ghost" onClick={() => { if (admin) { navigate('/app/admin/firms'); return } setDir(-1); setStarted(false) }}><ArrowLeft size={16} /> {t(L('Rudi', 'Back'))}</button>}
           {step < STEPS.length - 1
             ? <button className="btn btn-gold" onClick={next} disabled={busy}>{busy ? <Loader2 size={16} className="spin" /> : <>{t(L('Endelea', 'Continue'))} <ArrowRight size={16} /></>}</button>
             : <button className="btn btn-gold btn-lg" onClick={submit} disabled={busy}>{busy ? <Loader2 size={16} className="spin" /> : <><Send size={17} /> {admin ? 'Submit and approve' : t(app?.status === 'correction_required' ? L('Tuma marekebisho', 'Resubmit') : L('Tuma maombi', 'Submit application'))}</>}</button>}

@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { ArrowLeft, ArrowRight, Briefcase, CalendarCheck, CheckCircle2, CircleAlert, Download, FileText, Loader2, Lock, MessageSquare, Plus, Send, Timer, UserRound } from 'lucide-react'
 import { api, download } from './api.js'
 import { Badge, Card, DetailList, Modal, PageHead, StatCard } from './shared.jsx'
+import { navigate } from '../router.js'
 
 const fmt = (d) => (d ? new Date(d).toLocaleDateString() : '—')
 const fmtTime = (d) => (d ? new Date(d).toLocaleString() : '—')
@@ -22,8 +23,8 @@ function Loading({ error }) {
   return <div className="fb-center-inline"><Loader2 className="spin" /></div>
 }
 
-const goMatters = () => { window.location.hash = '#/app/advocate/matters' }
-const openMatter = (id) => { window.location.hash = `#/app/advocate/matters/${id}` }
+const goMatters = () => { navigate('/app/advocate/matters') }
+const openMatter = (id) => { navigate(`/app/advocate/matters/${id}`) }
 
 /* ---------------------------------------------------------------- Dashboard */
 export function AdvocateOverview() {
@@ -113,14 +114,14 @@ export function AdvocateDetails() {
 }
 
 /* ---------------------------------------------------------------- Matters */
-const MATTER = /^#\/app\/advocate\/matters\/([0-9a-f-]{36})/
+const MATTER = /^\/app\/advocate\/matters\/([0-9a-f-]{36})/
 
 export function AdvocateMatters() {
-  const [id, setId] = useState(() => (window.location.hash.match(MATTER) || [])[1] || null)
+  const [id, setId] = useState(() => (window.location.pathname.match(MATTER) || [])[1] || null)
   useEffect(() => {
-    const on = () => setId((window.location.hash.match(MATTER) || [])[1] || null)
-    window.addEventListener('hashchange', on)
-    return () => window.removeEventListener('hashchange', on)
+    const on = () => setId((window.location.pathname.match(MATTER) || [])[1] || null)
+    window.addEventListener('popstate', on)
+    return () => window.removeEventListener('popstate', on)
   }, [])
   return id ? <MatterPage key={id} id={id} /> : <MatterList />
 }
@@ -165,16 +166,16 @@ function MatterPage({ id }) {
   const [m, setM] = useState(null)
   const [error, setError] = useState('')
   const [tab, setTab] = useState('Documents')
-  const [view, setView] = useState(() => (CHAT.test(window.location.hash) ? 'chat' : 'case')) // the case data and the WhatsApp chat are separate pages
+  const [view, setView] = useState(() => (CHAT.test(window.location.pathname) ? 'chat' : 'case')) // the case data and the WhatsApp chat are separate pages
   const [closing, setClosing] = useState(false)
   const [busy, setBusy] = useState(false)
 
   const load = useCallback(() => api(`advocate/matters/${id}/`).then(setM).catch((e) => setError(e.message)), [id])
   useEffect(() => { load() }, [load])
   useEffect(() => {
-    const on = () => setView(CHAT.test(window.location.hash) ? 'chat' : 'case')
-    window.addEventListener('hashchange', on)
-    return () => window.removeEventListener('hashchange', on)
+    const on = () => setView(CHAT.test(window.location.pathname) ? 'chat' : 'case')
+    window.addEventListener('popstate', on)
+    return () => window.removeEventListener('popstate', on)
   }, [])
 
   const start = async () => {
@@ -185,12 +186,12 @@ function MatterPage({ id }) {
   if (m && view === 'chat') return <AdvocateChat id={id} m={m} />
   return (
     <>
-      <a href="#/app/advocate/matters" className="ap-back"><ArrowLeft size={16} /> Matters</a>
+      <a href="/app/advocate/matters" className="ap-back"><ArrowLeft size={16} /> Matters</a>
       {!m ? <Loading error={error} /> : (
         <>
           <PageHead title={m.reference} sub={`${m.service || 'Legal matter'} · Client ${m.client}`}>
             <Badge tone={STATUS_TONE[m.status_label]}>{m.status_label}</Badge>
-            <a className="btn btn-outline-navy" href={`#/app/advocate/matters/${id}/chat`}><MessageSquare size={16} /> WhatsApp chat</a>
+            <a className="btn btn-outline-navy" href={`/app/advocate/matters/${id}/chat`}><MessageSquare size={16} /> WhatsApp chat</a>
             {m.status === 'advocate_assigned' && <button className="btn btn-gold" onClick={start} disabled={busy}>{busy ? <Loader2 size={16} className="spin" /> : 'Start work'}</button>}
             {m.status === 'active' && !m.ready_to_close_at && <button className="btn btn-outline-navy" onClick={() => setClosing(true)}>Mark ready to close</button>}
           </PageHead>
@@ -213,7 +214,7 @@ function MatterPage({ id }) {
   )
 }
 
-const CHAT = /^#\/app\/advocate\/matters\/[0-9a-f-]{36}\/chat/
+const CHAT = /^\/app\/advocate\/matters\/[0-9a-f-]{36}\/chat/
 const when = (d) => {
   const x = new Date(d)
   return x.toDateString() === new Date().toDateString() ? x.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : x.toLocaleDateString([], { day: 'numeric', month: 'short' })
@@ -237,7 +238,7 @@ function AdvocateChat({ id, m }) {
           {!data && <div className="fb-center-inline"><Loader2 className="spin" /></div>}
           {data && rows.length === 0 && <p className="fb-muted inb-empty">No conversations here.</p>}
           {rows.map((r) => (
-            <a key={r.id} href={`#/app/advocate/matters/${r.id}/chat`} className={`inb-row ${r.id === id ? 'on' : ''}`}>
+            <a key={r.id} href={`/app/advocate/matters/${r.id}/chat`} className={`inb-row ${r.id === id ? 'on' : ''}`}>
               <span className="inb-ava"><UserRound size={18} /></span>
               <span className="inb-main">
                 <strong>{r.reference}</strong>
@@ -304,7 +305,7 @@ function Messages({ id, m }) {
   return (
     <>
       <header className="inb-head">
-        <a href={`#/app/advocate/matters/${id}`} className="inb-back" aria-label="Back to the case"><ArrowLeft size={18} /></a>
+        <a href={`/app/advocate/matters/${id}`} className="inb-back" aria-label="Back to the case"><ArrowLeft size={18} /></a>
         <span className="inb-ava lg"><UserRound size={20} /></span>
         <div className="inb-who">
           <strong>Client {m.client}</strong>
@@ -312,7 +313,7 @@ function Messages({ id, m }) {
         </div>
         <Badge tone={CHAT_TONE[chat.status]}>{CHAT_LABEL[chat.status]}</Badge>
         <div className="inb-actions">
-          <a className="btn btn-outline-navy d-sm" href={`#/app/advocate/matters/${id}`}>Matter {m.reference}</a>
+          <a className="btn btn-outline-navy d-sm" href={`/app/advocate/matters/${id}`}>Matter {m.reference}</a>
           {started && chat.can_chat && !chat.mine && <button className="btn btn-gold d-sm" disabled={busy} onClick={() => act('take-over')}>Take over</button>}
           {chat.mine && chat.can_chat && <button className="btn btn-outline-navy d-sm" disabled={busy} onClick={() => act('release')}>Give back to bot</button>}
         </div>

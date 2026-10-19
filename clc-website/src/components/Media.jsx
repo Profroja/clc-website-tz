@@ -43,7 +43,7 @@ const isVideo = (m) => m.type !== 'machapisho' || !!m.youtube || !!m.video
 function MediaCard({ m, lang, featured = false }) {
   return (
     <motion.article layout className={`mcard ${featured ? 'mcard--feat' : ''}`} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
-      <a href={`#/media/${m.id}`} className="mcard-img">
+      <a href={`/media/${m.id}`} className="mcard-img">
         {autoplays(m) ? <AutoVideo src={m.video} poster={m.cover} /> : <Thumb m={m} />}
         <span className={`mtag mtag--${m.type}`}>{typeLabel(m.type, lang)}</span>
         {isVideo(m) && !autoplays(m) && <span className="mplay"><Play size={featured ? 30 : 22} fill="currentColor" /></span>}
@@ -53,7 +53,7 @@ function MediaCard({ m, lang, featured = false }) {
         <span className="mdate"><CalendarDays size={14} /> {formatDate(m.date, lang)}</span>
         <h3>{pick(m.title, lang)}</h3>
         <p>{pick(m.excerpt, lang)}</p>
-        <a href={`#/media/${m.id}`} className="mmore">{UI.media.more[lang]} <ArrowRight size={16} /></a>
+        <a href={`/media/${m.id}`} className="mmore">{UI.media.more[lang]} <ArrowRight size={16} /></a>
       </div>
     </motion.article>
   )
@@ -74,7 +74,7 @@ export function MediaSection() {
           {recent.map((m) => <MediaCard key={m.id} m={m} lang={lang} />)}
         </div>
         <div className="mall">
-          <a href="#/media" className="btn btn-gold btn-lg">{t(UI.media.viewAll)} <ArrowRight size={18} /></a>
+          <a href="/media" className="btn btn-gold btn-lg">{t(UI.media.viewAll)} <ArrowRight size={18} /></a>
         </div>
       </div>
     </section>
@@ -141,7 +141,7 @@ export function MediaPage({ id }) {
       <main className="mpage">
         <div className="container mpage-inner" style={{ textAlign: 'center' }}>
           <h1>404</h1>
-          <a href="#/media" className="btn btn-gold">{UI.media.back[lang]}</a>
+          <a href="/media" className="btn btn-gold">{UI.media.back[lang]}</a>
         </div>
       </main>
     )
@@ -153,7 +153,7 @@ export function MediaPage({ id }) {
     <main className="mpage">
       <div className="mpage-hero">
         <div className="container">
-          <a href="#/media" className="mback"><ArrowLeft size={16} /> {UI.media.back[lang]}</a>
+          <a href="/media" className="mback"><ArrowLeft size={16} /> {UI.media.back[lang]}</a>
           <Reveal>
             <span className={`mtag mtag--${m.type} mtag--static`}>{typeLabel(m.type, lang)}</span>
             <h1>{pick(m.title, lang)}</h1>
@@ -194,7 +194,7 @@ export function MediaPage({ id }) {
           </div>
           <h4 className="mside-title">{UI.media.related[lang]}</h4>
           {related.map((r) => (
-            <a key={r.id} href={`#/media/${r.id}`} className="mrel">
+            <a key={r.id} href={`/media/${r.id}`} className="mrel">
               <Thumb m={r} />
               <span><small>{typeLabel(r.type, lang)}</small>{pick(r.title, lang)}</span>
             </a>
@@ -206,7 +206,7 @@ export function MediaPage({ id }) {
 }
 
 // The floating live window: it appears while CLC is live on YouTube and autoplays (muted).
-// Clicking the video or the title opens the live page (#/live) with the full player and the WhatsApp chat.
+// Clicking the video or the title opens the live page (/live) with the full player and the WhatsApp chat.
 export function LiveMini({ hidden = false }) {
   const { t } = useLang()
   const { live } = useLive()
@@ -226,17 +226,17 @@ export function LiveMini({ hidden = false }) {
           <div className="live-screen">
             <iframe src={`https://www.youtube.com/embed/${live.video_id}?autoplay=1&mute=1&playsinline=1&controls=0&rel=0`} title="Live"
               allow="autoplay; encrypted-media; picture-in-picture" tabIndex={-1} />
-            <a href="#/live" className="live-click" aria-label={title} />
+            <a href="/live" className="live-click" aria-label={title} />
             <div className="live-bar">
               <span className="live-badge"><span className="live-dot" /> LIVE</span>
               <span className="live-actions">
-                <a href="#/live" aria-label="Open" title="Open"><Maximize2 size={15} /></a>
+                <a href="/live" aria-label="Open" title="Open"><Maximize2 size={15} /></a>
                 <button onClick={() => setState('min')} aria-label="Minimize" title="Minimize"><Minus size={16} /></button>
                 <button onClick={() => setClosedFor(live.video_id)} aria-label="Close" title="Close"><X size={16} /></button>
               </span>
             </div>
           </div>
-          <a href="#/live" className="live-title">{title}</a>
+          <a href="/live" className="live-title">{title}</a>
         </motion.div>
       )}
     </div>

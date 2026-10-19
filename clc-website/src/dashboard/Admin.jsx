@@ -45,7 +45,7 @@ export function AdminOverview() {
                         <td><strong>{f.firm_name}</strong></td>
                         <td>{f.region}</td>
                         <td><Badge>{f.status}</Badge></td>
-                        <td><a href="#/app/admin/firms" className="btn btn-navy d-sm">Review</a></td>
+                        <td><a href="/app/admin/firms" className="btn btn-navy d-sm">Review</a></td>
                       </tr>
                     ))}
                   </tbody>

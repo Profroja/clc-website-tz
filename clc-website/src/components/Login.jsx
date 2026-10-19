@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Building2, Check, Eye, EyeOff, Loader2, Lock, Mail, Scale, ShieldCheck, UserRound } from 'lucide-react'
 import { useLang } from '../i18n.jsx'
+import { navigate } from '../router.js'
 
 const T = {
   brand: { en: 'Community Legal Clinic' },
@@ -73,7 +74,7 @@ export default function Login() {
       sessionStorage.setItem('clc_auth', JSON.stringify({ access: data.access, refresh: data.refresh, user: data.user, membership: data.membership }))
       setSignedAs(data.membership)
       setStep('done')
-      window.location.hash = '#/app' // the dashboard sends each role to its own home
+      navigate('/app') // the dashboard sends each role to its own home
     } catch (e) {
       fail(e)
     } finally {

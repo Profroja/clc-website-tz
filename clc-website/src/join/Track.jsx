@@ -94,7 +94,7 @@ export default function Track({ id, token }) {
 
         {app.editable && (
           <div className="j-actions">
-            <a className="btn btn-outline-navy" href={`#/join/edit/${id}/${token}`}><Pencil size={16} /> {t(L('Hariri maombi', 'Edit application'))}</a>
+            <a className="btn btn-outline-navy" href={`/join/edit/${id}/${token}`}><Pencil size={16} /> {t(L('Hariri maombi', 'Edit application'))}</a>
             {app.status === 'correction_required' && <button className="btn btn-gold" onClick={resubmit} disabled={busy}>{busy ? <Loader2 size={16} className="spin" /> : <><Send size={16} /> {t(L('Tuma tena', 'Resubmit'))}</>}</button>}
           </div>
         )}

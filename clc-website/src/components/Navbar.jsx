@@ -97,7 +97,7 @@ export default function Navbar() {
         </nav>
         <div className="nav-actions">
           <LangSwitcher />
-          <a href="#/login" className="btn btn-gold btn-shine nav-book"><LogIn size={16} /> {t({ sw: 'Ingia', en: 'Login', zh: '登录' })}</a>
+          <a href="/login" className="btn btn-gold btn-shine nav-book"><LogIn size={16} /> {t({ sw: 'Ingia', en: 'Login', zh: '登录' })}</a>
           <button className="burger" onClick={() => setOpen(true)} aria-label="Open menu"><Menu /></button>
         </div>
       </div>
@@ -130,7 +130,7 @@ export default function Navbar() {
               ))}
               <div className="drawer-foot">
                 <LangSwitcher />
-                <a href="#/login" onClick={() => setOpen(false)} className="btn btn-gold"><LogIn size={16} /> {t({ sw: 'Ingia', en: 'Login', zh: '登录' })}</a>
+                <a href="/login" onClick={() => setOpen(false)} className="btn btn-gold"><LogIn size={16} /> {t({ sw: 'Ingia', en: 'Login', zh: '登录' })}</a>
                 <a href="https://wa.me/255745118253" className="btn btn-wa"><WhatsAppIcon /> WhatsApp</a>
               </div>
             </motion.div>

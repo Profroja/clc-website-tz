@@ -2,11 +2,12 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { ArrowLeft, Bot, CircleAlert, FlaskConical, Loader2, Lock, RotateCcw, Send, UserRound, X } from 'lucide-react'
 import { api } from './api.js'
 import { Badge } from './shared.jsx'
+import { navigate } from '../router.js'
 
 const TABS = [['queued', 'Waiting'], ['with_staff', 'With staff'], ['bot', 'Bot'], ['closed', 'Closed'], ['all', 'All']]
 const TONE = { queued: 'red', with_staff: 'blue', bot: 'navy', closed: 'green' }
 const LABEL = { queued: 'Waiting for CLC', with_staff: 'With staff', bot: 'Bot', closed: 'Closed' }
-const DETAIL = /^#\/app\/admin\/conversations\/([0-9a-f-]{36})/
+const DETAIL = /^\/app\/admin\/conversations\/([0-9a-f-]{36})/
 
 const when = (d) => {
   const x = new Date(d)
@@ -15,15 +16,15 @@ const when = (d) => {
 }
 
 export default function Inbox() {
-  const [selected, setSelected] = useState(() => (window.location.hash.match(DETAIL) || [])[1] || null)
-  const [tab, setTab] = useState(() => ((window.location.hash.match(DETAIL) || [])[1] ? 'all' : 'queued')) // opening a chat by link shows it in the list
+  const [selected, setSelected] = useState(() => (window.location.pathname.match(DETAIL) || [])[1] || null)
+  const [tab, setTab] = useState(() => ((window.location.pathname.match(DETAIL) || [])[1] ? 'all' : 'queued')) // opening a chat by link shows it in the list
   const [list, setList] = useState(null)
   const [error, setError] = useState('')
 
   useEffect(() => {
-    const on = () => setSelected((window.location.hash.match(DETAIL) || [])[1] || null)
-    window.addEventListener('hashchange', on)
-    return () => window.removeEventListener('hashchange', on)
+    const on = () => setSelected((window.location.pathname.match(DETAIL) || [])[1] || null)
+    window.addEventListener('popstate', on)
+    return () => window.removeEventListener('popstate', on)
   }, [])
 
   const loadList = useCallback(() => api('admin/conversations/').then((r) => { setList(r); setError('') }).catch((e) => setError(e.message)), [])
@@ -35,7 +36,7 @@ export default function Inbox() {
 
   const shown = (list || []).filter((c) => tab === 'all' || c.status === tab)
   const count = (s) => (list || []).filter((c) => c.status === s).length
-  const open = (id) => { window.location.hash = `#/app/admin/conversations/${id}` }
+  const open = (id) => { navigate(`/app/admin/conversations/${id}`) }
 
   return (
     <div className={`inb ${selected ? 'has-thread' : ''}`}>
@@ -125,7 +126,7 @@ function Thread({ id, onChanged }) {
   return (
     <>
       <header className="inb-head">
-        <a href="#/app/admin/conversations" className="inb-back" aria-label="Back to the list"><ArrowLeft size={18} /></a>
+        <a href="/app/admin/conversations" className="inb-back" aria-label="Back to the list"><ArrowLeft size={18} /></a>
         <span className="inb-ava lg"><UserRound size={20} /></span>
         <div className="inb-who">
           <strong>{c.client_name || 'Client'}{c.is_test && <em><FlaskConical size={11} /> flow test</em>}</strong>
@@ -133,7 +134,7 @@ function Thread({ id, onChanged }) {
         </div>
         <Badge tone={TONE[c.status]}>{LABEL[c.status]}</Badge>
         <div className="inb-actions">
-          {c.matter_id && <a className="btn btn-outline-navy d-sm" href={`#/app/admin/matters/${c.matter_id}`}>Matter {c.matter_reference}</a>}
+          {c.matter_id && <a className="btn btn-outline-navy d-sm" href={`/app/admin/matters/${c.matter_id}`}>Matter {c.matter_reference}</a>}
           {c.status !== 'with_staff' && !closed && <button className="btn btn-gold d-sm" disabled={busy} onClick={() => act('take-over')}>Take over</button>}
           {c.status === 'with_staff' && <button className="btn btn-outline-navy d-sm" disabled={busy} onClick={() => act('release')}><RotateCcw size={14} /> Give back to bot</button>}
           {!closed && <button className="u-icon danger" title="Close conversation" aria-label="Close conversation" disabled={busy} onClick={() => act('close')}><X size={16} /></button>}

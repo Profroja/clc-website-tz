@@ -68,7 +68,7 @@ def notify_admins(app, subject, body):
 
 
 def tracking_link(app, token):
-    return f'{settings.FRONTEND_URL}/#/join/track/{app.id}/{token}'
+    return f'{settings.FRONTEND_URL}/join/track/{app.id}/{token}'
 
 
 def email(to, subject, body):
@@ -408,13 +408,13 @@ def _create_login(app, membership_admin, full_name, mail, phone, role, organizat
     if temp:
         email(mail, 'Your CLC platform account',
               f'Hello {full_name},\n\n{app.firm_name} has been approved on the CLC platform. Your {role_name} account:\n\n'
-              f'Username: {mail}\nTemporary password: {temp}\nSign in: {settings.FRONTEND_URL}/#/login\n\n'
+              f'Username: {mail}\nTemporary password: {temp}\nSign in: {settings.FRONTEND_URL}/login\n\n'
               f'You will be asked to choose a new password the first time you sign in.\n\n'
               f'Habari {full_name}, {app.firm_name} imeidhinishwa kwenye jukwaa la CLC. '
               f'Tumia taarifa hapo juu kuingia; utaombwa kuweka nenosiri jipya.')
     else:
         email(mail, 'New CLC role added',
-              f'Hello {full_name},\n\nYou now also work as {role_name} for {app.firm_name}. Sign in: {settings.FRONTEND_URL}/#/login')
+              f'Hello {full_name},\n\nYou now also work as {role_name} for {app.firm_name}. Sign in: {settings.FRONTEND_URL}/login')
     return user
 
 

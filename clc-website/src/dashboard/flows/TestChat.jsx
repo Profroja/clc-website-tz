@@ -109,8 +109,8 @@ export default function TestChat({ flowId, getDefinition, langs, files, onActive
           : 'Off: nothing is saved. Turn on to see the matters this flow creates for real (start a new test to change it).'}</small>
         {real && (convId || matters.length > 0) && (
           <span className="fb-real-links">
-            {convId && <a href={`#/app/admin/conversations/${convId}`} target="_blank" rel="noreferrer">Open this chat</a>}
-            {matters.length > 0 && <a href="#/app/admin/matters" target="_blank" rel="noreferrer">Matters: {matters.join(', ')}</a>}
+            {convId && <a href={`/app/admin/conversations/${convId}`} target="_blank" rel="noreferrer">Open this chat</a>}
+            {matters.length > 0 && <a href="/app/admin/matters" target="_blank" rel="noreferrer">Matters: {matters.join(', ')}</a>}
           </span>
         )}
       </div>

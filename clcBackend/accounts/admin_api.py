@@ -114,7 +114,7 @@ def reset_password(request, membership_id):
         send_mail('Your CLC password was reset',
                   f'Hello {m.user.full_name},\n\nA CLC administrator set a new temporary password for you.\n\n'
                   f'Username: {m.user.email}\nTemporary password: {temp}\n'
-                  f'You will be asked to choose a new password when you sign in: {settings.FRONTEND_URL}/#/login',
+                  f'You will be asked to choose a new password when you sign in: {settings.FRONTEND_URL}/login',
                   settings.DEFAULT_FROM_EMAIL, [m.user.email])
     except Exception:
         pass

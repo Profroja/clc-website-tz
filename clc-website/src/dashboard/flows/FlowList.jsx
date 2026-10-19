@@ -4,19 +4,20 @@ import { api } from '../api.js'
 import { Card, Drawer, Field, PageHead } from '../shared.jsx'
 import { BotFiles, BotSettingsForm } from './BotSetup.jsx'
 import { WhatsAppSetup } from './WhatsAppSetup.jsx'
+import { navigate } from '../../router.js'
 
 // The builder (and React Flow) loads only when an admin opens a flow, not for website visitors.
 const FlowBuilder = lazy(() => import('./FlowBuilder.jsx'))
 
-const BUILDER = /^#\/app\/admin\/flows\/([0-9a-f-]{36})/
+const BUILDER = /^\/app\/admin\/flows\/([0-9a-f-]{36})/
 
 function useBuilderId() {
-  const read = () => (window.location.hash.match(BUILDER) || [])[1] || null
+  const read = () => (window.location.pathname.match(BUILDER) || [])[1] || null
   const [id, setId] = useState(read)
   useEffect(() => {
     const on = () => setId(read())
-    window.addEventListener('hashchange', on)
-    return () => window.removeEventListener('hashchange', on)
+    window.addEventListener('popstate', on)
+    return () => window.removeEventListener('popstate', on)
   }, [])
   return id
 }
@@ -63,7 +64,7 @@ export default function FlowList() {
       setRemoveError(err.message)
     }
   }
-  const open = (id) => { window.location.hash = `#/app/admin/flows/${id}` }
+  const open = (id) => { navigate(`/app/admin/flows/${id}`) }
   const create = async (e) => {
     e.preventDefault()
     setFormError('')
@@ -80,7 +81,7 @@ export default function FlowList() {
   if (builderId) {
     return (
       <Suspense fallback={<div className="fb fb-center"><Loader2 className="spin" size={28} /></div>}>
-        <FlowBuilder flowId={builderId} onExit={() => { window.location.hash = '#/app/admin/flows' }} />
+        <FlowBuilder flowId={builderId} onExit={() => { navigate('/app/admin/flows') }} />
       </Suspense>
     )
   }

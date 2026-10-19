@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { ArrowLeft, CheckCircle2, CircleAlert, Download, FileText, Loader2, MessageSquare, Trash2, UserCheck } from 'lucide-react'
 import { api, download } from './api.js'
 import { Badge, Card, DetailList, Field, Modal, PageHead } from './shared.jsx'
+import { navigate } from '../router.js'
 
 const TABS = [['all', 'All'], ['unassigned', 'Unassigned'], ['assigned', 'Assigned'], ['closed', 'Closed']]
 const STATUS_TONE = { new: 'amber', under_review: 'blue', referred: 'blue', advocate_assigned: 'amber', active: 'blue', closed: 'green', referred_back: 'red' }
@@ -10,14 +11,14 @@ const fmt = (d) => (d ? new Date(d).toLocaleDateString() : '—')
 const fmtTime = (d) => (d ? new Date(d).toLocaleString() : '—')
 const size = (b) => (b > 1048576 ? `${(b / 1048576).toFixed(1)} MB` : `${Math.max(1, Math.round(b / 1024))} KB`)
 
-const DETAIL = /^#\/app\/admin\/matters\/([0-9a-f-]{36})/
+const DETAIL = /^\/app\/admin\/matters\/([0-9a-f-]{36})/
 
 export default function AdminMatters() {
-  const [id, setId] = useState(() => (window.location.hash.match(DETAIL) || [])[1] || null)
+  const [id, setId] = useState(() => (window.location.pathname.match(DETAIL) || [])[1] || null)
   useEffect(() => {
-    const on = () => setId((window.location.hash.match(DETAIL) || [])[1] || null)
-    window.addEventListener('hashchange', on)
-    return () => window.removeEventListener('hashchange', on)
+    const on = () => setId((window.location.pathname.match(DETAIL) || [])[1] || null)
+    window.addEventListener('popstate', on)
+    return () => window.removeEventListener('popstate', on)
   }, [])
   return id ? <MatterPage key={id} id={id} /> : <MatterList />
 }
@@ -46,7 +47,7 @@ function MatterList() {
               <thead><tr><th>S/N</th><th>Reference</th><th>Client</th><th>Service</th><th>Region</th><th>Priority</th><th>Status</th><th>Advocate</th><th>Created</th></tr></thead>
               <tbody>
                 {shown.map((m, i) => (
-                  <tr key={m.id} className="clickable-row" onClick={() => { window.location.hash = `#/app/admin/matters/${m.id}` }}>
+                  <tr key={m.id} className="clickable-row" onClick={() => { navigate(`/app/admin/matters/${m.id}`) }}>
                     <td>{i + 1}</td>
                     <td className="nowrap"><strong>{m.reference}</strong>{m.is_test && <small>Flow test</small>}</td>
                     <td><strong>{m.client_name || '—'}</strong><small>{m.client_phone}</small></td>
@@ -80,12 +81,12 @@ function MatterPage({ id }) {
 
   return (
     <>
-      <a href="#/app/admin/matters" className="ap-back"><ArrowLeft size={16} /> Matters</a>
+      <a href="/app/admin/matters" className="ap-back"><ArrowLeft size={16} /> Matters</a>
       {!m ? (error ? <Card><p className="fb-error"><CircleAlert size={18} /> {error}</p></Card> : <div className="fb-center-inline"><Loader2 className="spin" /></div>) : (
         <>
           <PageHead title={m.reference} sub={`${m.service || 'Legal matter'} · ${m.client_name || 'Client'}`}>
             <Badge tone={m.ready_to_close ? 'green' : STATUS_TONE[m.status]}>{m.status_label}</Badge>
-            {m.conversation_id && <a className="btn btn-outline-navy" href={`#/app/admin/conversations/${m.conversation_id}`}><MessageSquare size={16} /> Open conversation</a>}
+            {m.conversation_id && <a className="btn btn-outline-navy" href={`/app/admin/conversations/${m.conversation_id}`}><MessageSquare size={16} /> Open conversation</a>}
             {m.ready_to_close && <button className="btn btn-gold" onClick={() => setClosing(true)}><CheckCircle2 size={16} /> Close matter</button>}
             {m.status !== 'closed' && !m.ready_to_close && <button className="btn btn-gold" onClick={() => setAssigning(true)}><UserCheck size={16} /> {m.advocate ? 'Reassign' : 'Assign advocate'}</button>}
             <button className="btn btn-outline-navy" onClick={() => setDeleting(true)}><Trash2 size={16} /> Delete</button>
@@ -234,7 +235,7 @@ function DeleteDialog({ matter, onClose }) {
   const remove = async () => {
     setBusy(true)
     setError('')
-    try { await api(`admin/matters/${matter.id}/delete/`, { method: 'DELETE' }); window.location.hash = '#/app/admin/matters' } catch (e) { setError(e.message); setBusy(false) }
+    try { await api(`admin/matters/${matter.id}/delete/`, { method: 'DELETE' }); navigate('/app/admin/matters') } catch (e) { setError(e.message); setBusy(false) }
   }
 
   return (

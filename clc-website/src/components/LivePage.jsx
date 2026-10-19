@@ -65,7 +65,7 @@ export default function LivePage() {
             <h1>{t(T.offTitle)}</h1>
             <p>{t(T.offText)}</p>
             <div className="live-off-actions">
-              <a href="#/media" className="btn btn-gold btn-lg">{t(T.past)}</a>
+              <a href="/media" className="btn btn-gold btn-lg">{t(T.past)}</a>
               <a href={live?.channel_url} target="_blank" rel="noreferrer" className="btn btn-outline-gold">{t(T.channel)} <ExternalLink size={16} /></a>
             </div>
           </div>

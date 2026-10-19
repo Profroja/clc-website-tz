@@ -3,6 +3,7 @@ import { AlertTriangle, ArrowLeft, Building2, CalendarClock, Check, CircleAlert,
 import { api, download } from './api.js'
 import Join from '../join/Join.jsx'
 import { Avatar, Badge, Card, DetailList, PageHead, StatCard } from './shared.jsx'
+import { navigate } from '../router.js'
 
 const GROUPS = [
   ['all', 'All', null],
@@ -29,16 +30,16 @@ function Problems({ items }) {
   )
 }
 
-const DETAIL = /^#\/app\/admin\/firms\/([0-9a-f-]{36})/
-const NEW = /^#\/app\/admin\/firms\/new/
+const DETAIL = /^\/app\/admin\/firms\/([0-9a-f-]{36})/
+const NEW = /^\/app\/admin\/firms\/new/
 
 export default function AdminFirmsLive() {
-  const [id, setId] = useState(() => (window.location.hash.match(DETAIL) || [])[1] || null)
-  const [adding, setAdding] = useState(() => NEW.test(window.location.hash))
+  const [id, setId] = useState(() => (window.location.pathname.match(DETAIL) || [])[1] || null)
+  const [adding, setAdding] = useState(() => NEW.test(window.location.pathname))
   useEffect(() => {
-    const on = () => { setId((window.location.hash.match(DETAIL) || [])[1] || null); setAdding(NEW.test(window.location.hash)) }
-    window.addEventListener('hashchange', on)
-    return () => window.removeEventListener('hashchange', on)
+    const on = () => { setId((window.location.pathname.match(DETAIL) || [])[1] || null); setAdding(NEW.test(window.location.pathname)) }
+    window.addEventListener('popstate', on)
+    return () => window.removeEventListener('popstate', on)
   }, [])
   if (adding) return <Join admin />
   return id ? <ApplicationPage key={id} id={id} /> : <FirmsList />
@@ -64,7 +65,7 @@ function FirmsList() {
   return (
     <>
       <PageHead title="Law firms" sub="Applications, registration details and onboarding for every law firm.">
-        <a className="btn btn-gold" href="#/app/admin/firms/new"><Plus size={17} /> Add law firm</a>
+        <a className="btn btn-gold" href="/app/admin/firms/new"><Plus size={17} /> Add law firm</a>
       </PageHead>
       {error && <Card><p className="fb-error"><CircleAlert size={18} /> {error}</p></Card>}
       <div className="d-stats">
@@ -101,7 +102,7 @@ function FirmsList() {
               </thead>
               <tbody>
                 {shown.map((a, i) => (
-                  <tr key={a.id} onClick={() => { window.location.hash = `#/app/admin/firms/${a.id}` }}>
+                  <tr key={a.id} onClick={() => { navigate(`/app/admin/firms/${a.id}`) }}>
                     <td>{i + 1}</td>
                     <td>{a.application_number}</td>
                     <td><strong>{a.firm_name}</strong></td>
@@ -139,7 +140,7 @@ function ApplicationPage({ id }) {
 
   return (
     <>
-      <a href="#/app/admin/firms" className="ap-back"><ArrowLeft size={16} /> Law firms</a>
+      <a href="/app/admin/firms" className="ap-back"><ArrowLeft size={16} /> Law firms</a>
       <PageHead title={app ? app.firm_name : 'Application'} sub={app ? `${app.application_number} · submitted ${fmtTime(app.submitted_at)}` : ''}>
         {app && <Badge>{app.status}</Badge>}
       </PageHead>
