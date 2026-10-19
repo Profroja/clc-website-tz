@@ -1,9 +1,8 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { UI, useLang } from '../i18n.jsx'
 import { WhatsAppIcon } from './Icons.jsx'
 import { waLink } from '../data.js'
-import { useMediaPosts } from '../mediaPosts.js'
 
 const DURATION = 6500
 
@@ -32,33 +31,9 @@ const textVariants = {
   exit: { opacity: 0, y: -16, transition: { duration: 0.3 } },
 }
 
-// The Podcast and Mijadala videos play silently behind the hero, one after another. The picture stays underneath until a video is ready.
-function HeroVideo({ sources, onPlaying }) {
-  const [i, setI] = useState(0)
-  const [on, setOn] = useState(false)
-  const ref = useRef(null)
-  const src = sources[i % sources.length]
-  useEffect(() => {
-    setOn(false)
-    ref.current?.play().catch(() => {})
-  }, [src])
-  return (
-    <video
-      ref={ref} key={src} className={`hero-video ${on ? 'on' : ''}`} src={src} autoPlay muted playsInline preload="auto" loop={sources.length === 1}
-      onPlaying={() => { setOn(true); onPlaying(true) }} onEnded={() => setI((n) => n + 1)} onError={() => { onPlaying(false); setI((n) => n + 1) }}
-      aria-hidden="true" tabIndex={-1}
-    />
-  )
-}
-
-const saveData = () => typeof navigator !== 'undefined' && (navigator.connection?.saveData || window.matchMedia?.('(prefers-reduced-motion: reduce)').matches)
-
 export default function HeroSlider() {
   const { t } = useLang()
   const [index, setIndex] = useState(0)
-  const { items } = useMediaPosts()
-  const [playing, setPlaying] = useState(false)
-  const videos = saveData() ? [] : items.filter((m) => (m.type === 'podcast' || m.type === 'mijadala') && m.video).map((m) => m.video)
 
   useEffect(() => {
     const id = setTimeout(() => setIndex((i) => (i + 1) % SLIDES.length), DURATION)
@@ -69,7 +44,7 @@ export default function HeroSlider() {
   const copy = UI.hero[index]
 
   return (
-    <section id="home" className={`hero${playing ? ' hero--video' : ''}`}>
+    <section id="home" className="hero">
       <motion.div
         className="hero-bg"
         style={{ backgroundImage: `url(${slide.bg})` }}
@@ -77,7 +52,6 @@ export default function HeroSlider() {
         animate={{ opacity: 1 }}
         transition={{ duration: 1.1 }}
       />
-      {videos.length > 0 && <HeroVideo sources={videos} onPlaying={setPlaying} />}
       <div className="hero-shade" />
       <div className="hero-sweep" />
       <div className="hero-dust" />

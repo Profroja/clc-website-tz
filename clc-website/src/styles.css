@@ -689,19 +689,6 @@ input:focus, textarea:focus { outline: none; border-color: var(--gold); backgrou
 .mcard:hover .mcard-img video { transform: scale(1.06); }
 .mrel video { width: 84px; height: 64px; object-fit: cover; border-radius: 10px; flex: none; pointer-events: none; }
 
-/* Hero: silent Podcast / Mijadala videos behind the message */
-.hero-video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity 1.4s; pointer-events: none; }
-.hero-video.on { opacity: 1; }
-.hero--video .hero-shade {
-  background:
-    radial-gradient(ellipse at 75% 40%, rgba(201, 162, 39, .16), transparent 55%),
-    linear-gradient(90deg, rgba(6,15,31,.96) 0%, rgba(6,15,31,.86) 42%, rgba(6,15,31,.62) 75%, rgba(6,15,31,.78) 100%),
-    linear-gradient(0deg, rgba(6,15,31,.92) 0%, transparent 38%);
-}
-@media (max-width: 980px) {
-  .hero--video .hero-shade { background: linear-gradient(180deg, rgba(6,15,31,.86) 0%, rgba(6,15,31,.68) 45%, rgba(6,15,31,.78) 70%, rgba(6,15,31,.95) 100%); }
-}
-
 /* Mobile hero: headline, then the picture, then the WhatsApp and Appointment buttons */
 @media (max-width: 980px) {
   .hero-copy, .hero-copy-in { display: contents; }
