@@ -7,6 +7,7 @@ import {
 import { UI, useLang } from '../i18n.jsx'
 import { waLink, WHATSAPP } from '../data.js'
 import { usePackages } from '../packages.js'
+import { LEGAL_DOCS } from '../legal.js'
 import { Reveal, SectionHead } from './ui.jsx'
 import { Logo } from './Navbar.jsx'
 import { SOCIALS, Social, WhatsAppIcon } from './Icons.jsx'
@@ -320,6 +321,7 @@ export function Footer() {
         <div>
           <h4>{t(F.quick)}</h4>
           {['home', 'services', 'contact'].map((k) => <a key={k} href={`#${k === 'home' ? 'home' : k}`}>{t(UI.nav[k])}</a>)}
+          {LEGAL_DOCS.map((d) => <a key={d.slug} href={`#/${d.slug}`}>{t(d.short)}</a>)}
         </div>
         <div>
           <h4>{t(F.services)}</h4>
@@ -338,7 +340,7 @@ export function Footer() {
       <div className="container footer-bottom">
         <span>© {new Date().getFullYear()} Community Legal Clinic (CLC). All rights reserved.</span>
         <span className="f-disc">{t(F.disclaimer)}</span>
-        <span className="f-links"><a href="https://clc.tz/privacy.html">Privacy</a><a href="https://clc.tz/terms.html">Terms</a><a href="https://clc.tz/legal-disclaimer.html">Disclaimer</a></span>
+        <span className="f-links"><a href="#/privacy-policy">Privacy</a><a href="#/terms">Terms</a><a href="#/legal-disclaimer">Disclaimer</a></span>
       </div>
     </footer>
   )

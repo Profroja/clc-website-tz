@@ -5,6 +5,8 @@ import { ServiceBands, ServicesOverview } from './components/Services.jsx'
 import { LiveMini, MediaArchive, MediaPage, MediaSection } from './components/Media.jsx'
 import Login from './components/Login.jsx'
 import LivePage from './components/LivePage.jsx'
+import LegalPage from './components/LegalPage.jsx'
+import { legalDoc } from './legal.js'
 import AppointmentModal from './appointments/AppointmentModal.jsx'
 import Dashboard from './dashboard/Dashboard.jsx'
 import Join from './join/Join.jsx'
@@ -28,6 +30,7 @@ export default function App() {
   const hash = useHash()
   const match = hash.match(MEDIA_ROUTE)
   const mediaId = match ? decodeURIComponent(match[1]) : null
+  const legal = legalDoc(hash.slice(2))
 
   // Hash routing swaps the whole page, so the browser can't scroll to anchors itself.
   useEffect(() => {
@@ -53,6 +56,8 @@ export default function App() {
         <MediaArchive />
       ) : hash === '#/live' ? (
         <LivePage />
+      ) : legal ? (
+        <LegalPage doc={legal} />
       ) : mediaId ? (
         <MediaPage id={mediaId} />
       ) : (
